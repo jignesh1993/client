@@ -14,24 +14,42 @@ import Input from "./Input";
 import { GoogleOAuthProvider } from "@react-oauth/google";
 import { GoogleLogin } from "@react-oauth/google";
 import { useDispatch } from "react-redux";
-import { AUTH } from "../../constants/actionTypes"
-import jwt from 'jwt-decode'
+import { AUTH, SIGNUP } from "../../constants/actionTypes";
+import jwt from "jwt-decode";
 import { useHistory } from "react-router-dom";
+import { signup, signin } from "../../actions/auth";
+
+const initialState = {
+  firstName: "",
+  lastName: "",
+  email: "",
+  password: "",
+  confirmPassword: "",
+};
 
 const Auth = () => {
   const classes = useStyles();
   const dispatch = useDispatch();
   const history = useHistory();
 
-  const state = null;
   const [showPassword, setShowPassword] = useState(false);
   const [isSignedUp, setIsSignedUp] = useState(false);
+  const [formData, setFormData] = useState(initialState);
 
-  const handleSubmit = () => {
-    console.log("Form Submitted");
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    console.log("FormData ==>> ", formData);
+    if (isSignedUp) {
+      dispatch(signup(formData, history));
+    } else {
+      dispatch(signin(formData, history));
+    }
   };
 
-  const handleChange = () => {};
+  const handleChange = (e) => {
+    e.preventDefault();
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
 
   const handleShowPassword = () =>
     setShowPassword((prevShowPassword) => !prevShowPassword);
@@ -47,7 +65,7 @@ const Auth = () => {
 
     try {
       dispatch({ type: AUTH, data: { result, token } });
-      history.push('/');
+      history.push("/");
     } catch (error) {
       console.log("error -->>", error);
     }
@@ -81,8 +99,8 @@ const Auth = () => {
                   half
                 />
                 <Input
-                  name="secondName"
-                  label="Second Name"
+                  name="lastName"
+                  label="Last Name"
                   handleChange={handleChange}
                   half
                 />
