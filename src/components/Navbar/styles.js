@@ -8,7 +8,7 @@ export default makeStyles((theme) => ({
     flexDirection: "row",
     justifyContent: "space-between",
     padding: "10px",
-    alignItems: "center"
+    alignItems: "center",
   },
   heading: {
     color: "rgba(0,183,255, 1)",
@@ -18,5 +18,15 @@ export default makeStyles((theme) => ({
   },
   brandContainer: {
     // padding: "10px"
-  }
+  },
+  profile: {
+    display: "inline-flex",
+  },
+  purple: {
+    marginRight: "10px",
+  },
+  userName: {
+    marginTop: "5px",
+    marginRight: "10px",
+  },
 }));

@@ -7,15 +7,22 @@ import {
   Typography,
   Container,
   TextField,
-  Icon,
 } from "@material-ui/core";
-import { GoogleLogin } from "react-google-login";
 import LockOutlinedIcon from "@material-ui/icons/LockOutlined";
 import useStyles from "./styles";
 import Input from "./Input";
+import { GoogleOAuthProvider } from "@react-oauth/google";
+import { GoogleLogin } from "@react-oauth/google";
+import { useDispatch } from "react-redux";
+import { AUTH } from "../../constants/actionTypes"
+import jwt from 'jwt-decode'
+import { useHistory } from "react-router-dom";
 
 const Auth = () => {
   const classes = useStyles();
+  const dispatch = useDispatch();
+  const history = useHistory();
+
   const state = null;
   const [showPassword, setShowPassword] = useState(false);
   const [isSignedUp, setIsSignedUp] = useState(false);
@@ -32,6 +39,25 @@ const Auth = () => {
   const switchMode = () => {
     setIsSignedUp((preIsSinedUp) => !preIsSinedUp);
     setShowPassword(false);
+  };
+
+  const googleSuccess = async (res) => {
+    const result = jwt(res?.credential);
+    const token = res?.credential;
+
+    try {
+      dispatch({ type: AUTH, data: { result, token } });
+      history.push('/');
+    } catch (error) {
+      console.log("error -->>", error);
+    }
+
+    console.log("res -->>", res);
+  };
+
+  const googleFailure = (error) => {
+    console.log("<<-- error -->>", error);
+    console.log("Google Sign In was unsuccessful. Try again later");
   };
 
   return (
@@ -84,22 +110,13 @@ const Auth = () => {
               />
             )}
           </Grid>
-          <GoogleLogin
-            clientId="Google Id"
-            render={(renderProps) => (
-              <Button
-                className={classes.googleButton}
-                color="primary"
-                fullWidth
-                onClick={renderProps.onClick}
-                disabled={renderProps.disabled}
-                startIcon={<Icon />}
-                variant="contained"
-              >
-                Login with google
-              </Button>
-            )}
-          />
+          <GoogleOAuthProvider clientId="317676119424-deqk4qrnj9gdv4hppgfpb6qef43hf1r5.apps.googleusercontent.com">
+            <GoogleLogin
+              onSuccess={googleSuccess}
+              onFailure={googleFailure}
+              cookiePolicy="single_host_origin"
+            />
+          </GoogleOAuthProvider>
           <Button
             type="submit"
             fullWidth
